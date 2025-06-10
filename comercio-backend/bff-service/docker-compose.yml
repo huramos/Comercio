@@ -1,0 +1,127 @@
+services:
+  database:
+    image: gvenzl/oracle-xe
+    container_name: oracle-db
+    ports:
+      - "1521:1521"
+    environment:
+      - ORACLE_SID=XE
+      - ORACLE_PDB=ORCLPDB1
+      - ORACLE_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    networks:
+      - comercio-net
+    restart: always
+
+  bff-service:
+    build: ../bff-service
+    container_name: bff-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      - database
+      - pedido
+      - producto
+      - promociones
+      - usuarios
+    ports:
+      - "8085:8085"
+    networks:
+      - comercio-net
+    restart: always
+
+  pedido:
+    build: ../pedido
+    container_name: pedido
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      - database
+    ports:
+      - "8083:8083"
+    networks:
+      - comercio-net
+    restart: always
+
+  producto:
+    build: ../producto
+    container_name: producto
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      - database
+    ports:
+      - "8082:8082"
+    networks:
+      - comercio-net
+    restart: always
+
+  promociones:
+    build: ../promociones
+    container_name: promociones
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      - database
+    ports:
+      - "8087:8087"
+    networks:
+      - comercio-net
+    restart: always
+
+  usuarios:
+    build: ../usuarios
+    container_name: usuarios
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      - database
+    ports:
+      - "8080:8080"
+    networks:
+      - comercio-net
+    restart: always
+
+  frontend:
+    build: ../../comercio-frontend
+    container_name: comercio-app
+    depends_on:
+      - bff-service
+    ports:
+      - "4200:4200"
+    networks:
+      - comercio-net
+    restart: always
+
+volumes:
+  oracle-data:
+
+networks:
+  comercio-net:
