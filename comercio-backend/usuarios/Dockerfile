@@ -1,5 +1,5 @@
 # Partimos de una imagen de Java 21 con Alpine (más ligera)
-FROM openjdk:17-jdk-slim  
+FROM openjdk:21-jdk-slim
 
 # Establecemos el directorio de trabajo dentro del contenedor
 WORKDIR /app  
@@ -18,7 +18,7 @@ COPY --chown=root:root ./Wallet_IP81T8PDDWJ4YVRG /app/Wallet_IP81T8PDDWJ4YVRG
 COPY target/usuarios-0.0.1-SNAPSHOT.jar /app/app.jar  
 
 # Exponemos el puerto 8080 (el que usa Spring Boot por defecto)
-EXPOSE 8081  
+EXPOSE 8080 
 
 # Comando para ejecutar la aplicación cuando el contenedor arranque
-ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8081"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8080", "--debug"]

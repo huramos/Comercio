@@ -1,5 +1,5 @@
 # Partimos de una imagen de Java 21 con Alpine (más ligera)
-FROM openjdk:17-jdk-slim  
+FROM openjdk:21-jdk-slim
 
 # Establecemos el directorio de trabajo dentro del contenedor
 WORKDIR /app  
@@ -21,4 +21,4 @@ COPY target/pedido-0.0.1-SNAPSHOT.jar /app/app.jar
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación cuando el contenedor arranque
-ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8081"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8083"]

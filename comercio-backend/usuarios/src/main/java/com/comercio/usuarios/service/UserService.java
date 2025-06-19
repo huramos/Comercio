@@ -18,6 +18,12 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        if (user.getUsername() == null || user.getPassword() == null || user.getRole() == null) {
+            throw new IllegalArgumentException("Username, password, and role are required");
+        }
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+            throw new IllegalArgumentException("Username already exists");
+        }
         return userRepository.save(user);
     }
 
@@ -27,9 +33,10 @@ public class UserService {
         if (existingUserOpt.isPresent()) {
             User existingUser = existingUserOpt.get();
             existingUser.setUsername(updatedUser.getUsername());
-            existingUser.setPassword(updatedUser.getPassword());
-            existingUser.setRole(updatedUser.getRole()); 
-
+            if (updatedUser.getPassword() != null) {
+                existingUser.setPassword(updatedUser.getPassword());
+            }
+            existingUser.setRole(updatedUser.getRole());
             return userRepository.save(existingUser);
         } else {
             throw new RuntimeException("Usuario no encontrado con ID: " + id);

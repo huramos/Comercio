@@ -4,7 +4,7 @@ import { map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private userUrl = 'http://localhost:8080/users';
+  private userUrl = 'http://localhost:8080/usuarios';
 
   constructor(private http: HttpClient) {}
 

@@ -31,9 +31,15 @@ export class RegisterComponent {
       role: this.role
     };
 
-    this.authService.register(newUser).subscribe(() => {
-      alert('Usuario registrado correctamente');
-      this.router.navigate(['/login']);
+    this.authService.register(newUser).subscribe({
+      next: () => {
+        alert('Usuario registrado correctamente');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Error al registrar:', err);
+        alert('Error al registrar: ' + (err.error || 'Inténtalo de nuevo'));
+      }
     });
   }
 
