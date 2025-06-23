@@ -17,7 +17,7 @@ COPY --chown=root:root ./Wallet_IP81T8PDDWJ4YVRG /app/Wallet_IP81T8PDDWJ4YVRG
 # Copiamos el JAR generado en el contenedor
 COPY target/pedido-0.0.1-SNAPSHOT.jar /app/app.jar  
 
-# Exponemos el puerto 8080 (el que usa Spring Boot por defecto)
+# Exponemos el puerto 8083 (el que usa Spring Boot por defecto)
 EXPOSE 8083
 
 # Comando para ejecutar la aplicación cuando el contenedor arranque

@@ -13,6 +13,30 @@ services:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     networks:
       - comercio-net
+    healthcheck:
+      test: ["CMD", "sqlplus", "-s", "system/${DB_PASSWORD}@XE", "SELECT 1 FROM dual"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: always
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - comercio-net
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: always
 
   bff-service:
@@ -23,14 +47,28 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_ENABLED=true
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_MAX_ATTEMPTS=5
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_INITIAL_INTERVAL=1000ms
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
-      - database
-      - pedido
-      - producto
-      - promociones
-      - usuarios
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      pedido:
+        condition: service_started
+      producto:
+        condition: service_started
+      promociones:
+        condition: service_started
+      usuarios:
+        condition: service_started
     ports:
       - "8085:8085"
     networks:
@@ -48,7 +86,8 @@ services:
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     ports:
       - "8083:8083"
     networks:
@@ -66,7 +105,8 @@ services:
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     ports:
       - "8082:8082"
     networks:
@@ -84,7 +124,8 @@ services:
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     ports:
       - "8087:8087"
     networks:
@@ -99,12 +140,50 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_ENABLED=true
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_MAX_ATTEMPTS=5
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_INITIAL_INTERVAL=1000ms
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "8080:8080"
+    networks:
+      - comercio-net
+    restart: always
+
+  rabbitmq-service:
+    build: ../rabbitmq-service
+    container_name: rabbitmq-service
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_USERNAME=${DB_USER}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
+      - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_ENABLED=true
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_MAX_ATTEMPTS=5
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_INITIAL_INTERVAL=1000ms
+    volumes:
+      - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
+    depends_on:
+      database:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    ports:
+      - "8088:8088"
     networks:
       - comercio-net
     restart: always
@@ -122,6 +201,7 @@ services:
 
 volumes:
   oracle-data:
+  rabbitmq-data:
 
 networks:
   comercio-net:

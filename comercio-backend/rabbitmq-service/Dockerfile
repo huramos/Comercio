@@ -15,10 +15,10 @@ RUN mkdir -p $ORACLE_WALLET_DIR
 COPY --chown=root:root ./Wallet_IP81T8PDDWJ4YVRG /app/Wallet_IP81T8PDDWJ4YVRG  
 
 # Copiamos el JAR generado en el contenedor
-COPY target/promociones-0.0.1-SNAPSHOT.jar /app/app.jar  
+COPY target/rabbitmq-service-0.0.1-SNAPSHOT.jar /app/app.jar  
 
-# Exponemos el puerto 8087 (el que usa Spring Boot por defecto)
-EXPOSE 8087 
+# Exponemos el puerto 8088 (el que usa Spring Boot por defecto)
+EXPOSE 8088 
 
 # Comando para ejecutar la aplicación cuando el contenedor arranque
-ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8087"]
+ENTRYPOINT ["java", "-jar", "/app/app.jar", "--server.port=8088", "--debug"]

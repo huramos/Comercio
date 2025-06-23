@@ -1,5 +1,6 @@
 package com.comercio.usuarios.controller;
 
+import com.comercio.usuarios.dto.LoginRequest;
 import com.comercio.usuarios.model.User;
 import com.comercio.usuarios.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,5 +35,10 @@ public class UserController {
         return "Usuario eliminado con éxito";
     }
 
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request) {
+        System.out.println("Intento de login para: " + request.getUsername());
+        boolean loginSuccess = userService.loginUser(request.getUsername(), request.getPassword());
+        return loginSuccess ? "Login exitoso" : "Credenciales inválidas";
+    }
 }
-
