@@ -15,7 +15,7 @@ public class LoginMessageConsumer {
     @Autowired
     private LoginEventRepository loginEventRepository;
 
-    @RabbitListener(queues = RabbitMQConfig.QUEUE_NAME)
+    @RabbitListener(queues = RabbitMQConfig.LOGIN_QUEUE) // Cambiado de QUEUE_NAME a LOGIN_QUEUE
     public void receiveMessage(String message) {
         try {
             logger.info("Mensaje recibido de RabbitMQ: {}", message);
