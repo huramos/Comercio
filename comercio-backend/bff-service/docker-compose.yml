@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   database:
     image: gvenzl/oracle-xe
@@ -79,14 +80,23 @@ services:
     build: ../pedido
     container_name: pedido
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high
+      - SPRING_DATASOURCE_URL=jdbc:oracle:thin:@ip81t8pddwj4yvrg_high?TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_ENABLED=true
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_MAX_ATTEMPTS=5
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_INITIAL_INTERVAL=1000ms
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
       database:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     ports:
       - "8083:8083"
@@ -121,10 +131,19 @@ services:
       - SPRING_DATASOURCE_USERNAME=${DB_USER}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
       - TNS_ADMIN=/app/Wallet_IP81T8PDDWJ4YVRG
+      - SPRING_RABBITMQ_HOST=rabbitmq
+      - SPRING_RABBITMQ_PORT=5672
+      - SPRING_RABBITMQ_USERNAME=guest
+      - SPRING_RABBITMQ_PASSWORD=guest
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_ENABLED=true
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_MAX_ATTEMPTS=5
+      - SPRING_RABBITMQ_TEMPLATE_RETRY_INITIAL_INTERVAL=1000ms
     volumes:
       - ./Wallet_IP81T8PDDWJ4YVRG:/app/Wallet_IP81T8PDDWJ4YVRG
     depends_on:
       database:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
     ports:
       - "8087:8087"
